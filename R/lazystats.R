@@ -57,7 +57,7 @@ fString <- function(aov_object, effect) {
   DFn <- aov_object$anova_table[effect, ]$"num Df"
   DFd <- aov_object$anova_table[effect, ]$"den Df"
 
-  if (DFn %% 1 != 0 | DFd %% 1 != 0) {
+  if (any((DFn %% 1 != 0) | (DFd %% 1 != 0))) {
     message("Sphericity Correction has been applied, returning DF to 2 decimals")
     DFn <- apaFormat(aov_object$anova_table[effect, ]$"num Df", Dec = 2, OneMax = FALSE)
     DFd <- apaFormat(aov_object$anova_table[effect, ]$"den Df", 2, Dec = 2, OneMax = FALSE)
@@ -82,7 +82,7 @@ fString <- function(aov_object, effect) {
 #' @examples
 pString <- function(aov_object, effect) {
   p <- apaFormat(aov_object$anova_table[effect, ]$"Pr(>F)", p = TRUE)
-  return(p)
+  return(str_c("\\emph{p}", " ", p))
 }
 
 #' @title
@@ -99,7 +99,7 @@ pString <- function(aov_object, effect) {
 #' @export
 #' @examples
 effString <- function(aov_object, effect) {
-  ges <- apaFormat(aov_object$anova_table[effect, ]$"ges", Dec = 3, OneMax = FALSE)
+  ges <- apaFormat(aov_object$anova_table[effect, ]$"ges", Dec = 2, OneMax = FALSE)
 
   return(str_c("$\\eta_{G}^2$ = ", ges))
 }
@@ -121,9 +121,9 @@ effString <- function(aov_object, effect) {
 aovString <- function(aov_object, effect, return_name = TRUE) {
   return(
     str_c(
-      ifelse(return_name, str_c(effect, "\n"), ""),
-      fString(aov_object, effect),
-      pString(aov_object, effect),
+      ifelse(return_name, str_c("Effect: '", effect, "'\n"), ""),
+      fString(aov_object, effect), ", ",
+      pString(aov_object, effect), ", ",
       effString(aov_object, effect)
     )
   )
