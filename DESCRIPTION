@@ -1,0 +1,5 @@
+Package: PsychUtils
+Title: My Formatting helpers for Reports
+Description: Formats ANOVA strings for apa-Reports -> replaces MyUtils.
+Version: 1.0 
+RoxygenNote: 7.3.2
