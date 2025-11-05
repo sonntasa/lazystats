@@ -60,9 +60,9 @@ fString <- function(aov_object, effect) {
   if (any((DFn %% 1 != 0) | (DFd %% 1 != 0))) {
     message("Sphericity Correction has been applied, returning DF to 2 decimals")
     DFn <- apaFormat(aov_object$anova_table[effect, ]$"num Df", Dec = 2, OneMax = FALSE)
-    DFd <- apaFormat(aov_object$anova_table[effect, ]$"den Df", 2, Dec = 2, OneMax = FALSE)
+    DFd <- apaFormat(aov_object$anova_table[effect, ]$"den Df", Dec = 2, OneMax = FALSE)
   }
-  F <- round(aov_object$anova_table[effect, ]$"F", 2)
+  F <- apaFormat(aov_object$anova_table[effect, ]$"F", Dec = 2, OneMax = FALSE)
 
   return(str_c("\\emph{F}", "(", DFn, ", ", DFd, ") = ", F))
 }
