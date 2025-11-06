@@ -99,9 +99,13 @@ pString <- function(aov_object, effect) {
 #' @export
 #' @examples
 effString <- function(aov_object, effect) {
-  ges <- apaFormat(aov_object$anova_table[effect, ]$"ges", Dec = 2, OneMax = FALSE)
-
-  return(str_c("$\\eta_{G}^2$ = ", ges))
+  if ("ges" %in% names(aov_object$anova_table[effect, ])) {
+    ges <- apaFormat(aov_object$anova_table[effect, ]$"ges", Dec = 2, OneMax = FALSE)
+    return(str_c("$\\eta_{G}^2$ = ", ges))
+  } else if ("pes" %in% names(aov_object$anova_table[effect, ])) {
+    pes <- apaFormat(aov_object$anova_table[effect, ]$"pes", Dec = 2, OneMax = FALSE)
+    return(str_c("$\\eta_{p}^2$ = ", pes))
+  }
 }
 
 #' @title
@@ -125,6 +129,40 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
       fString(aov_object, effect), ", ",
       pString(aov_object, effect), ", ",
       effString(aov_object, effect)
+    )
+  )
+}
+
+
+#' @title converT
+#'
+#' @description This function takes in a t-test from an emmeans comparisons and
+#' returns a formatted LaTeX F-string fit for a paper.
+#'
+#' @import glue
+#'
+#' @param t_object List
+#' @param effect_num integer
+#' @param return_name boolean
+#' @return a formated value string
+#' @export
+#' @examples
+converT <- function(t_object, effect_num) {
+  t_object <- summary(t_object)[effect_num, ]
+  t_val <- t_object$t.ratio
+  F <- apaFormat(t_val * t_val, OneMax = FALSE, Dec = 2, p = FALSE)
+  p <- apaFormat(t_object$p.value, p = TRUE)
+  df <- t_object$df
+  eff1 <- t_object[[1]]
+  eff2 <- t_object[[2]]
+  pes <- apaFormat(t_val^2 / (t_val^2 + df), OneMax = FALSE, Dec = 2)
+
+  return(
+    str_c(
+      "Effect: '", eff1, ", ", eff2, "'\n",
+      "\\emph{F}", "(", 1, ", ", df, ") = ", F, ", ",
+      "\\emph{p}", " ", p, ", ",
+      "$\\eta_{p}^2$ = ", pes
     )
   )
 }

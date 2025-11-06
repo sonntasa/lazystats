@@ -2,6 +2,7 @@
 
 export(aovString)
 export(apaFormat)
+export(converT)
 export(effString)
 export(fString)
 export(pString)
