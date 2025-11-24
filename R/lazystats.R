@@ -109,6 +109,38 @@ effString <- function(aov_object, effect) {
 }
 
 #' @title
+#' epsString
+#'
+#' @description This function takes in a afex ANOVA and returns a formatted
+#' epsilon for use in the aovString function.
+#'
+#' @import stringr
+#'
+#' @param aov_object List
+#' @param effect string
+#' @return a formated value string
+#' @export
+#' @examples
+epsString <- function(aov_object, effect) {
+  DFn <- aov_object$anova_table[effect, ]$"num Df"
+  DFd <- aov_object$anova_table[effect, ]$"den Df"
+
+  if (any((DFn %% 1 != 0) | (DFd %% 1 != 0))) {
+    return(
+      str_c(
+        ", $\\epsilon$ = ",
+        apaFormat(
+          summary(aov_object)$pval.adjustments[effect, ][[1]],
+          OneMax = FALSE,
+          Dec = 2,
+          p = FALSE
+        )
+      )
+    )
+  }
+}
+
+#' @title
 #' aovString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
@@ -128,7 +160,8 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
       ifelse(return_name, str_c("Effect: '", effect, "'\n"), ""),
       fString(aov_object, effect), ", ",
       pString(aov_object, effect), ", ",
-      effString(aov_object, effect)
+      effString(aov_object, effect),
+      epsString(aov_object, effect)
     )
   )
 }
