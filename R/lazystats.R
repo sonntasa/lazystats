@@ -226,3 +226,68 @@ lazyformat <- function(lazy_object, effect_num = 1, effect_name = NULL) {
     )
   }
 }
+
+#' @title lazydemographics
+#'
+#' @description This function takes in one of my vpInfo objects and returns a
+#' fully formatted participants section---or at least the part where
+#' demographic information are reported.
+#' It takes in a dataset, the analyzed variables are id, age (numeric),
+#' gender (female, male, and any other) and handedness (left vs. right).
+#'
+#' @import glue
+#'
+#' @param dat dataset/tibble
+#' @return tibble
+#' @export
+#' @examples
+vpInfo <- function(dat) {
+  dat |>
+    distinct(id, .keep_all = TRUE) |>
+    mutate(age = as.numeric(age)) |>
+    summarize(
+      N       = n(),
+      meanAge = round(mean(age), 2),
+      sdAge   = round(sd(age), 2),
+      minAge  = range(age)[1],
+      maxAge  = range(age)[2],
+      nFemale = sum(gender == "female"),
+      nMale   = sum(gender == "male"),
+      nNa     = sum(!(gender %in% c("male", "female"))),
+      nRight  = sum(handedness == "right")
+    )
+}
+
+#' @title lazydemographics
+#'
+#' @description This function takes in one of my vpInfo objects and returns a
+#' fully formatted participants section---or at least the part where
+#' demographic information are reported.
+#'
+#' @import glue
+#'
+#' @param lazy_object any lazystats object
+#' @param effect_num integer
+#' @param effect_name string
+#' @return a formated value string
+#' @export
+#' @examples
+lazydemographics <- function(sample_orig = NULL, sample_final = NULL, full_text = TRUE) {
+  if (is.null(sample_orig) || is.null(sample_final)) {
+    sample <- if (is.null(sample_orig)) sample_final else sample_orig
+    return(
+      glue("{sample$N} people, \\textit{M} = {round(sample$meanAge, 2)}, \\textit\{SD\} = {round(sample$sdAge, 2)}, {sample$nFemale} female, {sample$nMale} male, {sample$nNa} other, {sample$nRight} right.")
+    )
+  } else if (full_text) {
+    return(
+      glue("In sum, {sample_orig$N} people took part in this experiment (\\textit\{M\} = {round(sample_orig$meanAge, 2)} years, \\textit\{SD\} = {round(sample_orig$sdAge, 2)}; {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other). Among those, {sample_orig$nRight} participants stated that they were right-handed. After all exclusion, the remaining sample consited of {sample_final$N} people (\\textit\{M\} = {round(sample_orig$meanAge, 2)} years, \\textit\{SD\} = {round(sample_orig$sdAge, 2)}).")
+    )
+  } else {
+    return(
+      str_c(
+        "Original Sample", glue("{sample_orig$N} people, \\textit{M} = {round(sample_orig$meanAge, 2)}, \\textit\{SD\} = {round(sample_orig$sdAge, 2)}, {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other, {sample_orig$nRight} right."),
+        "Final Sample", glue("{sample_final$N} people, \\textit{M} = {round(sample_final$meanAge, 2)}, \\textit\{SD\} = {round(sample_final$sdAge, 2)}, {sample_final$nFemale} female, {sample_final$nMale} male, {sample_final$nNa} other, {sample_final$nRight} right.")
+        ,sep = "\n")
+    )
+  }
+}
