@@ -276,18 +276,19 @@ lazydemographics <- function(sample_orig = NULL, sample_final = NULL, full_text 
   if (is.null(sample_orig) || is.null(sample_final)) {
     sample <- if (is.null(sample_orig)) sample_final else sample_orig
     return(
-      glue("{sample$N} people, \\textit{M} = {round(sample$meanAge, 2)}, \\textit\{SD\} = {round(sample$sdAge, 2)}, {sample$nFemale} female, {sample$nMale} male, {sample$nNa} other, {sample$nRight} right.")
+      glue("{sample$N} people, \\textit{{M}} = {round(sample$meanAge, 2)}, \\textit{{SD}} = {round(sample$sdAge, 2)}, {sample$nFemale} female, {sample$nMale} male, {sample$nNa} other, {sample$nRight} right.")
     )
   } else if (full_text) {
     return(
-      glue("In sum, {sample_orig$N} people took part in this experiment (\\textit\{M\} = {round(sample_orig$meanAge, 2)} years, \\textit\{SD\} = {round(sample_orig$sdAge, 2)}; {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other). Among those, {sample_orig$nRight} participants stated that they were right-handed. After all exclusion, the remaining sample consited of {sample_final$N} people (\\textit\{M\} = {round(sample_orig$meanAge, 2)} years, \\textit\{SD\} = {round(sample_orig$sdAge, 2)}).")
+      glue("In sum, {sample_orig$N} people took part in this experiment (\\textit{{M}} = {round(sample_orig$meanAge, 2)} years, \\textit{{SD}} = {round(sample_orig$sdAge, 2)}; {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other). Among those, {sample_orig$nRight} participants stated that they were right-handed. After all exclusion, the remaining sample consited of {sample_final$N} people (\\textit{{M}} = {round(sample_final$meanAge, 2)} years, \\textit{{SD}} = {round(sample_final$sdAge, 2)}).")
     )
   } else {
     return(
       str_c(
-        "Original Sample", glue("{sample_orig$N} people, \\textit{M} = {round(sample_orig$meanAge, 2)}, \\textit\{SD\} = {round(sample_orig$sdAge, 2)}, {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other, {sample_orig$nRight} right."),
-        "Final Sample", glue("{sample_final$N} people, \\textit{M} = {round(sample_final$meanAge, 2)}, \\textit\{SD\} = {round(sample_final$sdAge, 2)}, {sample_final$nFemale} female, {sample_final$nMale} male, {sample_final$nNa} other, {sample_final$nRight} right.")
-        ,sep = "\n")
+        "Original Sample", glue("{sample_orig$N} people, \\textit{{M}} = {round(sample_orig$meanAge, 2)}, \\textit{{SD}} = {round(sample_orig$sdAge, 2)}, {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other, {sample_orig$nRight} right."),
+        "Final Sample", glue("{sample_final$N} people, \\textit{{M}} = {round(sample_final$meanAge, 2)}, \\textit{{SD}} = {round(sample_final$sdAge, 2)}, {sample_final$nFemale} female, {sample_final$nMale} male, {sample_final$nNa} other, {sample_final$nRight} right."),
+        sep = "\n"
+      )
     )
   }
 }
