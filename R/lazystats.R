@@ -1,6 +1,4 @@
-#' @title
-#' apaFormat
-#'
+#' @title apaFormat
 #'
 #' @description This function reformats a value to fit the apa style.
 #' This means: removing leading zeros and rounding to 2 decimal places as a
@@ -40,8 +38,7 @@ and manually set the number of Decimals.")
   }
 }
 
-#' @title
-#' fString
+#' @title fString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
 #' F string [F(DFn, DFd) = f-value] for use in the aovString function
@@ -67,8 +64,7 @@ fString <- function(aov_object, effect) {
   return(str_c("\\emph{F}", "(", DFn, ", ", DFd, ") = ", F))
 }
 
-#' @title
-#' pString
+#' @title pString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
 #' p string (p = p-value) for use in the aovString function
@@ -85,8 +81,7 @@ pString <- function(aov_object, effect) {
   return(str_c("\\emph{p}", " ", p))
 }
 
-#' @title
-#' effString
+#' @title effString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
 #' effect string (ges) for use in the aovString function.
@@ -140,8 +135,7 @@ epsString <- function(aov_object, effect) {
   }
 }
 
-#' @title
-#' aovString
+#' @title aovString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
 #' LaTeX string fit for a paper.
@@ -198,4 +192,37 @@ converT <- function(t_object, effect_num) {
       "$\\eta_{p}^2$ = ", pes
     )
   )
+}
+
+#' @title lazyformat
+#'
+#' @description This functions serves as the wrapper for all other objects.
+#' It takes in any kind of object in the realm of lazystats and returns and apa
+#' (7) formatted string.
+#'
+#' @import glue
+#'
+#' @param lazy_object any lazystats object
+#' @param effect_num integer
+#' @param effect_name string
+#' @return a formated value string
+#' @export
+#' @examples
+lazyformat <- function(lazy_object, effect_num = 1, effect_name = NULL) {
+  if ("t.ratio" %in% names(lazy_object)) {
+    return(
+      converT(
+        t_object   = lazy_object,
+        effect_num = effect_num
+      )
+    )
+  } else if ("anova_table" %in% names(lazy_object)) {
+    return(
+      aovString(
+        aov_object  = lazy_object,
+        effect      = effect_name,
+        return_name = TRUE
+      )
+    )
+  }
 }
