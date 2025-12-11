@@ -194,7 +194,7 @@ converT <- function(t_object, effect_num) {
   )
 }
 
-#' @title descstring
+#' @title lazydesc
 #'
 #' @description This function handles the formatting of any kind of descriptive
 #' strings.
@@ -207,12 +207,12 @@ converT <- function(t_object, effect_num) {
 #' @return a formated value string
 #' @export
 #' @examples
-descstring <- function(desc_object, effect_num = NULL, rt = TRUE) {
+lazydesc <- function(desc_object, effect_num = NULL, rt = TRUE) {
   if (inherits(desc_object, "emmGrid")) {
     ## making sure effect_num isn't null
     effect_num <- if (is.null(effect_num)) 1 else effect_num
     ## Extract Name
-    ex_name <- test(desc_object)[[1]][effect_num]
+    ex_name <- str_c("Effect: '", test(desc_object)[[1]][effect_num], "'")
     ## Extract SEM
     ex_sem <- test(desc_object)$SE[effect_num]
     ## Extract M
@@ -233,7 +233,7 @@ descstring <- function(desc_object, effect_num = NULL, rt = TRUE) {
     unit <- " ms"
     digits <- 0
   } else {
-    unit <- " %"
+    unit <- " \\%"
     digits <- 2
   }
 
