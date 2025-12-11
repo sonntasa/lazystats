@@ -3,6 +3,7 @@
 export(aovString)
 export(apaFormat)
 export(converT)
+export(descstring)
 export(effString)
 export(epsString)
 export(fString)

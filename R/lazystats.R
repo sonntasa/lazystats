@@ -210,32 +210,46 @@ converT <- function(t_object, effect_num) {
 descstring <- function(desc_object, effect_num = NULL, rt = TRUE) {
   if (inherits(desc_object, "emmGrid")) {
     ## making sure effect_num isn't null
-    effect_num  <- if(is.null(effect_num)) 1 else effect_num
+    effect_num <- if (is.null(effect_num)) 1 else effect_num
     ## Extract Name
     ex_name <- test(desc_object)[[1]][effect_num]
     ## Extract SEM
-    ex_sem <- test(desc_object)$SE[effect_num])
+    ex_sem <- test(desc_object)$SE[effect_num]
     ## Extract M
     # ex_m <- if ("estimate" %in% names(test(desc_object))) test(desc_object)$estimate[effect_num] else test(desc_object)$emmean[effect_num]
-    ex_m <- 
+    ex_m <-
       ifelse(
         test = "estimate" %in% names(test(desc_object)),
         yes = test(desc_object)$estimate[effect_num],
         no = test(desc_object)$emmean[effect_num]
-    ) 
+      )
   } else {
-    ex_name <- "Wahtever you had put in ^^",
-    ex_sem <- desc_object$sem,
+    ex_name <- "Wahtever you had put in ^^"
+    ex_sem <- desc_object$sem
     ex_m <- desc_object$mean
   }
 
-  # if (rt) {
-  #
-  # }
-  
-  return(str_c(ex_name, "\n", "\\textit{M} = ", ))
-}
+  if (rt) {
+    unit <- " ms"
+    digits <- 0
+  } else {
+    unit <- " %"
+    digits <- 2
+  }
 
+  return(
+    str_c(
+      ex_name,
+      "\n",
+      "\\textit{M} = ",
+      apaFormat(ex_m, FALSE, digits),
+      unit,
+      ", ",
+      "\\textit{SEM} = ",
+      apaFormat(ex_sem, FALSE, digits)
+    )
+  )
+}
 
 #' @title lazyformat
 #'
