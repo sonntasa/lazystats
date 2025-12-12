@@ -161,10 +161,13 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
 }
 
 
-#' @title converT
+#' @title reportT
 #'
-#' @description This function takes in a t-test from an emmeans comparisons and
-#' returns a formatted LaTeX F-string fit for a paper.
+
+#' @description This function takes in a t-test from an emmeans comparisons
+#' and returns a formatted LaTeX t-/F-string fit for a paper. It determines
+#' whether the inserted object is a difference, or a difference of differences
+#' and returns the appopriate statistic.
 #'
 #' @import glue
 #'
@@ -176,22 +179,42 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
 #' @examples
 converT <- function(t_object, effect_num) {
   t_object <- summary(t_object)[effect_num, ]
-  t_val <- t_object$t.ratio
-  F <- apaFormat(t_val * t_val, OneMax = FALSE, Dec = 2, p = FALSE)
-  p <- apaFormat(t_object$p.value, p = TRUE)
   df <- t_object$df
+  t_val <- apaFormat(
+    val    = t_object$t.ratio,
+    OneMax = FALSE,
+    Dec    = 2
+  )
+  p <- apaFormat(
+    val = t_object$p.value,
+    p   = TRUE
+  )
   eff1 <- t_object[[1]]
   eff2 <- t_object[[2]]
-  pes <- apaFormat(t_val^2 / (t_val^2 + df), OneMax = FALSE, Dec = 2)
 
-  return(
-    str_c(
-      "Effect: '", eff1, ", ", eff2, "'\n",
-      "\\emph{F}", "(", 1, ", ", df, ") = ", F, ", ",
-      "\\emph{p}", " ", p, ", ",
-      "$\\eta_{p}^2$ = ", pes
+  if (is.character(eff2)) {
+    F <- apaFormat(t_val * t_val, OneMax = FALSE, Dec = 2, p = FALSE)
+    pes <- apaFormat(t_val^2 / (t_val^2 + df), OneMax = FALSE, Dec = 2)
+
+    return(
+      str_c(
+        "Effect: '", eff1, ", ", eff2, "'\n",
+        "\\emph{F}", "(", 1, ", ", df, ") = ", F, ", ",
+        "\\emph{p}", " ", p, ", ",
+        "$\\eta_{p}^2$ = ", pes
+      )
     )
-  )
+  } else {
+    d_val <- apaFormat(
+      val    = t_obj$t.ratio[effect_num] / sqrt(t_obj$df[effect_num] + 1),
+      OneMax = FALSE,
+      Dec    = 2
+    )
+
+    res_string <- glue::glue(
+      "\\emph{{t}}({df}) = {t_val}, \\emph{{p}} {p}, \\textit{{d}}\\textsubscript{{z}} = {d_val}"
+    )
+  }
 }
 
 #' @title lazydesc
@@ -265,14 +288,18 @@ lazydesc <- function(desc_object, effect_num = NULL, rt = TRUE) {
 #' @return a formated value string
 #' @export
 #' @examples
-lazyformat <- function(lazy_object, effect_num = 1, effect_name = NULL) {
-  if (is.null(lazy_object)) {
+lazyformat <- function(
+    lazy_object,
+    effect_num = 1,
+    effect_name = NULL,
+    convert = FALSE) {
+  if (is.null(names(lazy_object))) {
     message("Assuming an emmeans object, converting with 'test()'")
     lazy_object <- test(lazy_object)
   }
   if ("t.ratio" %in% names(lazy_object)) {
     return(
-      converT(
+      reportT(
         t_object   = lazy_object,
         effect_num = effect_num
       )
