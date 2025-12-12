@@ -266,6 +266,10 @@ lazydesc <- function(desc_object, effect_num = NULL, rt = TRUE) {
 #' @export
 #' @examples
 lazyformat <- function(lazy_object, effect_num = 1, effect_name = NULL) {
+  if (is.null(lazy_object)) {
+    message("Assuming an emmeans object, converting with 'test()'")
+    lazy_object <- test(lazy_object)
+  }
   if ("t.ratio" %in% names(lazy_object)) {
     return(
       converT(
