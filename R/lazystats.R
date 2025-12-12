@@ -206,7 +206,7 @@ reportT <- function(t_object, effect_num) {
     )
   } else {
     d_val <- apaFormat(
-      val    = t_obj$t.ratio[effect_num] / sqrt(t_obj$df[effect_num] + 1),
+      val    = t_val / sqrt(df + 1),
       OneMax = FALSE,
       Dec    = 2
     )

@@ -4,7 +4,7 @@
 \alias{lazyformat}
 \title{lazyformat}
 \usage{
-lazyformat(lazy_object, effect_num = 1, effect_name = NULL)
+lazyformat(lazy_object, effect_num = 1, effect_name = NULL, convert = FALSE)
 }
 \arguments{
 \item{lazy_object}{any lazystats object}
