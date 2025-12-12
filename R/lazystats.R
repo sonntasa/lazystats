@@ -177,7 +177,7 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
 #' @return a formated value string
 #' @export
 #' @examples
-converT <- function(t_object, effect_num) {
+reportT <- function(t_object, effect_num) {
   t_object <- summary(t_object)[effect_num, ]
   df <- t_object$df
   t_val <- apaFormat(
@@ -211,8 +211,13 @@ converT <- function(t_object, effect_num) {
       Dec    = 2
     )
 
-    res_string <- glue::glue(
-      "\\emph{{t}}({df}) = {t_val}, \\emph{{p}} {p}, \\textit{{d}}\\textsubscript{{z}} = {d_val}"
+    return(
+      str_c(
+        "Effect: ", eff1, " mean difference: ", round(eff2), "\n",
+        glue(
+          "\\emph{{t}}({df}) = {t_val}, \\emph{{p}} {p}, \\textit{{d}}\\textsubscript{{z}} = {d_val}"
+        )
+      )
     )
   }
 }
