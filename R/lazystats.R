@@ -179,12 +179,8 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
 #' @examples
 reportT <- function(t_object, effect_num) {
   t_object <- summary(t_object)[effect_num, ]
+  t_val <- t_object$t.ratio
   df <- t_object$df
-  t_val <- apaFormat(
-    val    = t_object$t.ratio,
-    OneMax = FALSE,
-    Dec    = 2
-  )
   p <- apaFormat(
     val = t_object$p.value,
     p   = TRUE
@@ -211,9 +207,15 @@ reportT <- function(t_object, effect_num) {
       Dec    = 2
     )
 
+    t_val <- apaFormat(
+      val    = t_val,
+      OneMax = FALSE,
+      Dec    = 2
+    )
+
     return(
       str_c(
-        "Effect: ", eff1, " mean difference: ", round(eff2), "\n",
+        "Effect: ", eff1, ", mean difference: ", round(eff2, 2), "\n",
         glue(
           "\\emph{{t}}({df}) = {t_val}, \\emph{{p}} {p}, \\textit{{d}}\\textsubscript{{z}} = {d_val}"
         )
