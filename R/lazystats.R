@@ -375,7 +375,7 @@ lazydemographics <- function(sample_orig = NULL, sample_final = NULL, full_text 
     )
   } else if (full_text) {
     return(
-      glue("In sum, {sample_orig$N} people took part in this experiment (\\textit{{M}} = {round(sample_orig$meanAge, 2)} years, \\textit{{SD}} = {round(sample_orig$sdAge, 2)}; {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other). Among those, {sample_orig$nRight} participants stated that they were right-handed. After all exclusion, the remaining sample consited of {sample_final$N} people (\\textit{{M}} = {round(sample_final$meanAge, 2)} years, \\textit{{SD}} = {round(sample_final$sdAge, 2)}).")
+      glue("In sum, {sample_orig$N} people took part in this experiment (\\textit{{M}} = {round(sample_orig$meanAge, 2)} years, \\textit{{SD}} = {round(sample_orig$sdAge, 2)}; {sample_orig$nFemale} female, {sample_orig$nMale} male, {sample_orig$nNa} other). Among those, {sample_orig$nRight} participants stated that they were right-handed. After all exclusion, the remaining sample consisted of {sample_final$N} people (\\textit{{M}} = {round(sample_final$meanAge, 2)} years, \\textit{{SD}} = {round(sample_final$sdAge, 2)}).")
     )
   } else {
     return(
