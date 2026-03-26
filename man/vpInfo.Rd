@@ -17,5 +17,5 @@ This function takes in one of my vpInfo objects and returns a
 fully formatted participants section---or at least the part where
 demographic information are reported.
 It takes in a dataset, the analyzed variables are id, age (numeric),
-gender (female, male, and any other) and handedness (left vs. right).
+gender (women, men, and non-binary individuals) and handedness (left vs. right).
 }
