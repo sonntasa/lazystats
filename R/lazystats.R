@@ -163,7 +163,6 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
 
 #' @title reportT
 #'
-
 #' @description This function takes in a t-test from an emmeans comparisons
 #' and returns a formatted LaTeX t-/F-string fit for a paper. It determines
 #' whether the inserted object is a difference, or a difference of differences
@@ -222,6 +221,49 @@ reportT <- function(t_object, effect_num) {
       )
     )
   }
+}
+
+#' @title baseT
+#'
+#' @description This function takes in a base R t-test
+#' and returns a formatted LaTeX t-/F-string fit for a paper.
+#'
+#' @import glue
+#'
+#' @param t_object List
+#' @param effect_num integer
+#' @param return_name boolean
+#' @return a formated value string
+#' @export
+#' @examples
+baseT <- function(t_object) {
+  t_val <- t_object$statistic
+  df <- t_object$parameter
+  p <- apaFormat(
+    val = t_object$p.value,
+    p   = TRUE
+  )
+
+  d_val <- apaFormat(
+    val    = t_val / sqrt(df + 1),
+    OneMax = FALSE,
+    Dec    = 2
+  )
+
+  t_val <- apaFormat(
+    val    = t_val,
+    OneMax = FALSE,
+    Dec    = 2
+  )
+
+  return(
+    str_c(
+      "Mean difference: ", round(t_object$estimate, 2), "\n",
+      glue(
+        "\\emph{{t}}({df}) = {t_val}, \\emph{{p}} {p}, \\textit{{d}}\\textsubscript{{z}} = {d_val}"
+      )
+    )
+  )
 }
 
 #' @title lazydesc
@@ -296,10 +338,11 @@ lazydesc <- function(desc_object, effect_num = NULL, rt = TRUE) {
 #' @export
 #' @examples
 lazyformat <- function(
-    lazy_object,
-    effect_num = 1,
-    effect_name = NULL,
-    convert = FALSE) {
+  lazy_object,
+  effect_num = 1,
+  effect_name = NULL,
+  convert = FALSE
+) {
   if (is.null(names(lazy_object))) {
     message("Assuming an emmeans object, converting with 'test()'")
     lazy_object <- test(lazy_object)
@@ -319,6 +362,8 @@ lazyformat <- function(
         return_name = TRUE
       )
     )
+  } else if ("statistic" %in% names(lazy_object)) {
+    return(baseT(t_object = lazy_object))
   }
 }
 
