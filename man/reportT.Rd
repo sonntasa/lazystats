@@ -4,7 +4,7 @@
 \alias{reportT}
 \title{reportT}
 \usage{
-reportT(t_object, effect_num)
+reportT(t_object, effect_num, convert = FALSE)
 }
 \arguments{
 \item{t_object}{List}

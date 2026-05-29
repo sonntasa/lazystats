@@ -181,7 +181,7 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
 #' @return a formated value string
 #' @export
 #' @examples
-reportT <- function(t_object, effect_num) {
+reportT <- function(t_object, effect_num, convert = FALSE) {
   t_object <- summary(t_object)[effect_num, ]
   t_val <- t_object$t.ratio
   df <- t_object$df
@@ -192,7 +192,8 @@ reportT <- function(t_object, effect_num) {
   eff1 <- t_object[[1]]
   eff2 <- t_object[[2]]
 
-  if (is.character(eff2)) {
+  if (all(is.character(eff2), convert)) {
+    message("converting to an F-Test")
     F <- apaFormat(t_val * t_val, OneMax = FALSE, Dec = 2, p = FALSE)
     pes <- apaFormat(t_val^2 / (t_val^2 + df), OneMax = FALSE, Dec = 2)
 
@@ -217,14 +218,25 @@ reportT <- function(t_object, effect_num) {
       Dec    = 2
     )
 
-    return(
-      str_c(
-        "Effect: ", eff1, ", mean difference: ", round(eff2, 2), "\n",
-        glue(
-          "$t({df}) = {t_val}$, $p {p}$, $d^z = {d_val}$"
+    if (is.double(eff2) || is.integer(eff2)) {
+      return(
+        str_c(
+          "Effect: ", eff1, ", mean difference: ", round(eff2, 2), "\n",
+          glue(
+            "$t({df}) = {t_val}$, $p {p}$, $d_z = {d_val}$"
+          )
         )
       )
-    )
+    } else {
+      return(
+        str_c(
+          "Effect: ", eff1, ", by: ", eff2, "\n",
+          glue(
+            "$t({df}) = {t_val}$, $p {p}$, $d_z = {d_val}$"
+          )
+        )
+      )
+    }
   }
 }
 
@@ -265,7 +277,7 @@ baseT <- function(t_object) {
     str_c(
       "Mean difference: ", round(t_object$estimate, 2), "\n",
       glue(
-        "$t({df}) = {t_val}$, $p {p}$, $d^z = {d_val}$"
+        "$t({df}) = {t_val}$, $p {p}$, $d_z = {d_val}$"
       )
     )
   )
@@ -318,7 +330,7 @@ lazydesc <- function(desc_object, effect_num = NULL, rt = TRUE) {
     str_c(
       ex_name,
       "\n",
-      "$\\mathit{M} = ",
+      "$M = ",
       apaFormat(ex_m, FALSE, digits),
       "$~",
       unit,
@@ -358,8 +370,9 @@ lazyformat <- function(
     message("registered a t-test")
     return(
       reportT(
-        t_object   = lazy_object,
-        effect_num = effect_num
+        t_object = lazy_object,
+        effect_num = effect_num,
+        convert = convert
       )
     )
   } else if ("anova_table" %in% names(lazy_object)) {
