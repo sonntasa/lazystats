@@ -296,7 +296,7 @@ baseT <- function(t_object) {
 #' @return a formated value string
 #' @export
 #' @examples
-lazydesc <- function(desc_object, effect_num = NULL, rt = TRUE) {
+lazydesc <- function(desc_object, effect_num = NULL, unit = "ms") {
   if (inherits(desc_object, "emmGrid")) {
     ## making sure effect_num isn't null
     effect_num <- if (is.null(effect_num)) 1 else effect_num
@@ -318,11 +318,13 @@ lazydesc <- function(desc_object, effect_num = NULL, rt = TRUE) {
     ex_m <- desc_object$mean
   }
 
-  if (rt) {
-    unit <- "ms"
+  if (unit == "ms") {
     digits <- 0
-  } else {
+  } else if (unit == "%") {
     unit <- "\\%"
+    digits <- 2
+  } else {
+    message("Unit: ", unit, "setting digits to apa default (2)")
     digits <- 2
   }
 
