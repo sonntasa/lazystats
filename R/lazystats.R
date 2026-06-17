@@ -324,7 +324,7 @@ lazydesc <- function(desc_object, effect_num = NULL, unit = "ms") {
     unit <- "\\%"
     digits <- 2
   } else {
-    message("Unit: ", unit, "setting digits to apa default (2)")
+    message("Unit: \"", unit, "\" setting digits to apa default (2)")
     digits <- 2
   }
 
