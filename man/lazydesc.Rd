@@ -4,7 +4,7 @@
 \alias{lazydesc}
 \title{lazydesc}
 \usage{
-lazydesc(desc_object, effect_num = NULL, rt = TRUE)
+lazydesc(desc_object, effect_num = NULL, unit = "ms")
 }
 \arguments{
 \item{effect_num}{integer}
