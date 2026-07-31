@@ -334,7 +334,7 @@ lazydesc <- function(desc_object, effect_num = NULL, unit = "ms") {
       "\n",
       "$M = ",
       apaFormat(ex_m, FALSE, digits),
-      "$~",
+      "$\\,",
       unit,
       ", ",
       "$\\mathit{SEM} = ",
@@ -440,11 +440,11 @@ lazydemographics <- function(sample_orig = NULL, sample_final = NULL, full_text 
   if (is.null(sample_orig) || is.null(sample_final)) {
     sample <- if (is.null(sample_orig)) sample_final else sample_orig
     return(
-      glue("{sample$N} people, $M = {round(sample$meanAge, 2)}$~years, $\\mathit{{SD}} = {round(sample$sdAge, 2)}$, {sample$nFemale} women, {sample$nMale} men, and {sample$nNa} non-binary individuals, {sample$nRight} right.")
+      glue("{sample$N} people, $M = {round(sample$meanAge, 2)}$\\,years, $\\mathit{{SD}} = {round(sample$sdAge, 2)}$, {sample$nFemale} women, {sample$nMale} men, and {sample$nNa} non-binary individuals, {sample$nRight} right.")
     )
   } else if (full_text) {
     return(
-      glue("In sum, {sample_orig$N} people took part in this experiment ($M = {round(sample_orig$meanAge, 2)}$~years, $\\mathit{{SD}} = {round(sample_orig$sdAge, 2)}$; {sample_orig$nFemale} women, {sample_orig$nMale} men, and {sample_orig$nNa} non-binary individuals). Among those, {sample_orig$nRight} participants stated that they were right-handed. After all exclusions, the remaining sample consisted of {sample_final$N} people ($M = {round(sample_final$meanAge, 2)}$~years, $\\mathit{{SD}} = {round(sample_final$sdAge, 2)}$).")
+      glue("In sum, {sample_orig$N} people took part in this experiment ($M = {round(sample_orig$meanAge, 2)}$\\,years, $\\mathit{{SD}} = {round(sample_orig$sdAge, 2)}$; {sample_orig$nFemale} women, {sample_orig$nMale} men, and {sample_orig$nNa} non-binary individuals). Among those, {sample_orig$nRight} participants stated that they were right-handed. After all exclusions, the remaining sample consisted of {sample_final$N} people ($M = {round(sample_final$meanAge, 2)}$\\,years, $\\mathit{{SD}} = {round(sample_final$sdAge, 2)}$).")
     )
   } else {
     return(
