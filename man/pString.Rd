@@ -4,7 +4,7 @@
 \alias{pString}
 \title{pString}
 \usage{
-pString(aov_object, effect)
+pString(aov_object, effect, which_p = "aov")
 }
 \arguments{
 \item{aov_object}{List}
@@ -16,5 +16,5 @@ a formated value string
 }
 \description{
 This function takes in a afex ANOVA and returns a formatted
-p string (p = p-value) for use in the aovString function
+p string (p = p-value) for use in other functions
 }

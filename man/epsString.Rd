@@ -16,5 +16,5 @@ a formated value string
 }
 \description{
 This function takes in a afex ANOVA and returns a formatted
-epsilon for use in the aovString function.
+epsilon for use in the reportAOV function.
 }

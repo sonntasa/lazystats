@@ -67,7 +67,7 @@ fString <- function(aov_object, effect) {
 #' @title pString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
-#' p string (p = p-value) for use in the aovString function
+#' p string (p = p-value) for use in other functions
 #'
 #' @import stringr
 #'
@@ -76,15 +76,19 @@ fString <- function(aov_object, effect) {
 #' @return a formated value string
 #' @export
 #' @examples
-pString <- function(aov_object, effect) {
-  p <- apaFormat(aov_object$anova_table[effect, ]$"Pr(>F)", p = TRUE)
+pString <- function(aov_object, effect, which_p = "aov") {
+  if (which_p == "aov") {
+    p <- apaFormat(aov_object$anova_table[effect, ]$"Pr(>F)", p = TRUE)
+  } else if (which_p == "chi") {
+    p <- apaFormat(aov_object$anova_table[effect, ]$"Pr(>Chisq)", p = TRUE)
+  }
   return(str_c("$p", " ", p, "$"))
 }
 
 #' @title effString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
-#' effect string (ges) for use in the aovString function.
+#' effect string (ges) for use in the reportAOV function.
 #'
 #' @import stringr
 #'
@@ -107,7 +111,7 @@ effString <- function(aov_object, effect) {
 #' epsString
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
-#' epsilon for use in the aovString function.
+#' epsilon for use in the reportAOV function.
 #'
 #' @import stringr
 #'
@@ -136,7 +140,7 @@ epsString <- function(aov_object, effect) {
   }
 }
 
-#' @title aovString
+#' @title reportAOV
 #'
 #' @description This function takes in a afex ANOVA and returns a formatted
 #' LaTeX string fit for a paper.
@@ -149,7 +153,7 @@ epsString <- function(aov_object, effect) {
 #' @return a formated value string
 #' @export
 #' @examples
-aovString <- function(aov_object, effect, return_name = TRUE) {
+reportAOV <- function(aov_object, effect, return_name = TRUE) {
   message("Testing, effect name: ", effect)
   if (is.null(effect)) {
     stop("No effect name given.")
@@ -164,6 +168,54 @@ aovString <- function(aov_object, effect, return_name = TRUE) {
       )
     )
   }
+}
+
+
+#' @title reportChi
+#'
+#' @description This function takes in a afex mixed model and returns a
+#' formatted LaTeX string fit for a paper.
+#'
+#' @import glue
+#'
+#' @param affex mixed object
+#' @param effect string
+#' @param return_name boolean
+#' @return a formated value string
+#' @export
+#' @examples
+reportChi <- function(chi_object, effect, return_name = TRUE) {
+  message("Testing, effect name: ", effect)
+  if (is.null(effect)) {
+    stop("No effect name given.")
+  } else {
+    return(
+      str_c(
+        ifelse(return_name, str_c("Effect: '", effect, "'\n"), ""),
+        chiString(chi_object, effect), ", ",
+        pString(chi_object, effect, which_p = "chi")
+      )
+    )
+  }
+}
+
+#' @title chiString
+#'
+#' @description This function takes in a afex mixed model and returns a
+#' formatted chi-string fit for a paper.
+#'
+#' @import glue
+#'
+#' @param affex mixed object
+#' @param effect string
+#' @return a formated value string
+#' @export
+#' @examples
+chiString <- function(aov_object, effect, return_name = TRUE) {
+  Df <- aov_object$anova_table[effect, ]$"Chi Df"
+  Chi <- apaFormat(aov_object$anova_table[effect, ]$"Chisq", Dec = 2, OneMax = FALSE)
+
+  return(str_c("$X^2", "(", Df, ") = ", Chi, "$"))
 }
 
 #' @title reportT
@@ -372,20 +424,32 @@ lazyformat <- function(
     message("registered a t-test")
     return(
       reportT(
-        t_object = lazy_object,
+        t_object   = lazy_object,
         effect_num = effect_num,
-        convert = convert
+        convert    = convert
       )
     )
   } else if ("anova_table" %in% names(lazy_object)) {
     message("registered an anova object")
-    return(
-      aovString(
-        aov_object  = lazy_object,
-        effect      = effect_name,
-        return_name = TRUE
+    if ("Chi Df" %in% names(lazy_object$anova_table)) {
+      message("\nChi-Squared test\n")
+      return(
+        reportChi(
+          chi_object  = lazy_object,
+          effect      = effect_name,
+          return_name = TRUE
+        )
       )
-    )
+    } else {
+      message("\nRegular ANOVA\n")
+      return(
+        reportAOV(
+          aov_object  = lazy_object,
+          effect      = effect_name,
+          return_name = TRUE
+        )
+      )
+    }
   } else if ("statistic" %in% names(lazy_object)) {
     return(baseT(t_object = lazy_object))
   }
