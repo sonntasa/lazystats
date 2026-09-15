@@ -486,6 +486,46 @@ vpInfo <- function(dat) {
     )
 }
 
+#' @title lazyTime
+#'
+#' @description This is a function that converts a base 10 (minute) time string
+#' to a human-readable base 6 (60) h, m & s string.
+#'
+#' @import stringr
+#'
+#' @param timeVal an unfomarted float
+#' @return character string
+#' @export
+#' @examples lazyTime(26.70683)
+lazyTime <- function(timeVal) {
+  hours <- timeVal %/% 60
+  mins <- floor(timeVal) - hours * 60
+  secs <- round((timeVal - floor(timeVal)) * 60)
+  if (hours > 0) {
+    returnString <- str_glue("{hours} h ")
+  } else {
+    returnString <- str_glue("")
+  }
+  return(str_glue("{returnString}{floor(mins)} m {secs} s"))
+}
+
+#' @title lazySave
+#'
+#' @description lazily save a data.frame (or tibble) to a desired directory to
+#' a ".csv" file
+#'
+#' @param timeVal an unfomarted float
+#' @return character string
+#' @export
+#' @examples lazySave(my_tibble)
+lazySave <- function(my_data, my_file, out_dir = OUT_DIR) {
+  my_file <- ifelse(
+    test = endsWith(my_file, ".csv"), my_file, str_c(my_file, ".csv")
+  )
+  write_csv(x = my_data, file = str_c(out_dir, "/", my_file))
+  message("\ndata saved to: ", basename(out_dir), "/", my_file, "\n")
+}
+
 #' @title lazydemographics
 #'
 #' @description This function takes in one of my vpInfo objects and returns a
