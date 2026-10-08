@@ -560,3 +560,108 @@ lazydemographics <- function(sample_orig = NULL, sample_final = NULL, full_text 
     )
   }
 }
+
+#' Format a table as bare LaTeX rows
+#'
+#' Converts a data frame (for example the output of \code{afex::nice()}) into
+#' LaTeX table body rows, without any of the wrappers (\code{\\begin{tabular}},
+#' \code{\\toprule}, \code{\\end{tabular}}, ...) that \code{knitr::kable()}
+#' adds. Cells are separated by \code{" & "} and every row ends in
+#' \code{"\\\\"}.
+#'
+#' @param x A data frame, matrix, or an object coercible to a data frame via
+#'   \code{as.data.frame()}, such as a \code{nice_table} returned by
+#'   \code{afex::nice()}.
+#' @param header Logical. Should a header row with the column names be
+#'   included? Defaults to \code{TRUE}.
+#' @param row.names Logical. Should row names be included as a first column?
+#'   Defaults to \code{FALSE}. (\code{nice()} output has a numeric row name
+#'   and an \code{Effect} column, so the row names are usually unwanted.)
+#' @param escape Logical. Should LaTeX special characters (\code{& % $ # _ { }})
+#'   in cells be escaped? Defaults to \code{FALSE}, so that pre-formatted
+#'   LaTeX (e.g. math mode) passes through untouched.
+#' @param collapse Character or \code{NULL}. If a string, the rows are
+#'   concatenated into a single string separated by this value (e.g.
+#'   \code{"\n"}). If \code{NULL} (default), a character vector with one
+#'   element per row is returned.
+#' @param trim Logical. Should leading and trailing whitespace be removed
+#'   from each cell? Defaults to \code{TRUE}. Useful because \code{nice()}
+#'   pads some columns for alignment.
+#'
+#' @return A character vector with one LaTeX-formatted string per row (or a
+#'   single string if \code{collapse} is not \code{NULL}). The result has
+#'   class \code{"lazytable"} for pretty printing with \code{cat()}-style
+#'   output; it behaves like a normal character vector otherwise.
+#'
+#' @examples
+#' df <- data.frame(
+#'   Effect = c("comp", "pola", "comp:pola"),
+#'   df = c("1.87, 114.25", "1, 61", "1.77, 107.83"),
+#'   MSE = c("6967.47", "8573.88", "2536.35"),
+#'   F = c("14.59 ***", "112.90 ***", "4.59 *"),
+#'   pes = c(".193", ".649", ".070"),
+#'   p.value = c("<.001", "<.001", ".015"),
+#'   stringsAsFactors = FALSE
+#' )
+#' lazytable(df)
+#' lazytable(df, header = FALSE)
+#'
+#' \dontrun{
+#' a <- afex::aov_ez("id", "RT", data, within = c("comp", "pola"))
+#' lazytable(afex::nice(a))
+#' }
+#'
+#' @export
+lazytable <- function(x,
+                      header = TRUE,
+                      row.names = FALSE,
+                      escape = FALSE,
+                      collapse = NULL,
+                      trim = TRUE) {
+  x <- as.data.frame(x, stringsAsFactors = FALSE)
+
+  if (row.names) {
+    x <- cbind(` ` = rownames(x), x, stringsAsFactors = FALSE)
+  }
+
+  # Everything to character (factors, numerics, ...)
+  cells <- lapply(x, function(col) {
+    col <- as.character(col)
+    col[is.na(col)] <- ""
+    if (trim) col <- trimws(col)
+    if (escape) col <- .lazytable_escape(col)
+    col
+  })
+
+  hdr <- names(x)
+  if (escape) hdr <- .lazytable_escape(hdr)
+
+  rows <- do.call(paste, c(cells, sep = " & "))
+  rows <- paste0(rows, "\\\\")
+
+  if (header) {
+    rows <- c(paste0(paste(hdr, collapse = " & "), "\\\\"), rows)
+  }
+
+  if (!is.null(collapse)) {
+    rows <- paste(rows, collapse = collapse)
+  }
+
+  class(rows) <- c("lazytable", "character")
+  rows
+}
+
+#' @export
+print.lazytable <- function(x, ...) {
+  cat(unclass(x), sep = "\n")
+  invisible(x)
+}
+
+# Internal helper: escape LaTeX special characters
+.lazytable_escape <- function(x) {
+  x <- gsub("\\", "\\textbackslash{}", x, fixed = TRUE)
+  x <- gsub("([&%$#_{}])", "\\\\\\1", x)
+  x <- gsub("~", "\\textasciitilde{}", x, fixed = TRUE)
+  x <- gsub("^", "\\textasciicircum{}", x, fixed = TRUE)
+  x
+}
