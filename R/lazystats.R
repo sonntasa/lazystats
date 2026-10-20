@@ -14,28 +14,34 @@
 #' @export
 #' @examples someValue <- apaFormat(someValue)
 apaFormat <- function(val, OneMax = TRUE, Dec = 3, p = FALSE) {
-  if (p && !OneMax) {
-    warning("Don't drink and work Samuel ...")
-  }
-  if (p && Dec != 3) {
-    warning("p-values are always formatted to 3 Decimals in accordance with APA
-rules. If you still want to format to more or less decimals, set p = FALSE
-and manually set the number of Decimals.")
-  }
+  val <- as.numeric(val)
+
+  # strip leading zero, including after a minus sign
+  strip0 <- function(x) sub("^(-?)0\\.", "\\1.", x)
+
   if (p) {
-    val <- as.numeric(val)
-    if (val > 0.001) {
-      return(paste0("= ", apaFormat(val, OneMax = TRUE, Dec = 3)))
-    } else {
-      return("< .001")
+    if (!OneMax) {
+      warning("OneMax is ignored for p-values (they are always max 1).",
+        call. = FALSE
+      )
     }
-  } else {
-    if (OneMax) {
-      return(sub("^0", "", sprintf(paste0("%.", Dec, "f"), val)))
-    } else {
-      return(sprintf(paste0("%.", Dec, "f"), val))
+    if (Dec != 3) {
+      warning("p-values are always formatted to 3 decimals (APA). To use a ",
+        "different number of decimals, set p = FALSE.",
+        call. = FALSE
+      )
     }
+    return(ifelse(
+      is.na(val), NA_character_,
+      ifelse(val < .001, "< .001",
+        paste0("= ", strip0(sprintf("%.3f", val)))
+      )
+    ))
   }
+
+  out <- sprintf(paste0("%.", Dec, "f"), val)
+  out[is.na(val)] <- NA_character_
+  if (OneMax) strip0(out) else out
 }
 
 #' @title fString
@@ -457,56 +463,61 @@ lazyformat <- function(
 
 #' @title lazydemographics
 #'
-#' @description This function takes in one of my vpInfo objects and returns a
-#' fully formatted participants section---or at least the part where
-#' demographic information are reported.
-#' It takes in a dataset, the analyzed variables are id, age (numeric),
-#' gender (women, men, and non-binary individuals) and handedness (left vs. right).
+#' @description Takes a dataset and returns the demographic summary for a
+#' participants section: N, age (mean, SD, range), gender counts
+#' (women, men, other) and handedness (right).
 #'
-#' @import glue
+#' @import dplyr
 #'
 #' @param dat dataset/tibble
+#' @param participant unquoted column with the participant identifier
+#' @param age unquoted column with age (coerced to numeric)
+#' @param gender unquoted column with gender ("female", "male", other)
+#' @param handedness unquoted column with handedness ("left", "right")
 #' @return tibble
 #' @export
 #' @examples
-vpInfo <- function(dat) {
+#' vpInfo(dat, participant = participant, age = age, gender = sex, handedness = hand)
+vpInfo <- function(dat,
+                   participant = id,
+                   age = age,
+                   gender = gender,
+                   handedness = handedness) {
   dat |>
-    distinct(id, .keep_all = TRUE) |>
-    mutate(age = as.numeric(age)) |>
+    distinct({{ participant }}, .keep_all = TRUE) |>
+    mutate(.age = as.numeric({{ age }})) |>
     summarize(
       N       = n(),
-      meanAge = round(mean(age), 2),
-      sdAge   = round(sd(age), 2),
-      minAge  = range(age)[1],
-      maxAge  = range(age)[2],
-      nFemale = sum(gender == "female"),
-      nMale   = sum(gender == "male"),
-      nNa     = sum(!(gender %in% c("male", "female"))),
-      nRight  = sum(handedness == "right")
+      meanAge = round(mean(.age, na.rm = TRUE), 2),
+      sdAge   = round(sd(.age, na.rm = TRUE), 2),
+      minAge  = min(.age, na.rm = TRUE),
+      maxAge  = max(.age, na.rm = TRUE),
+      nFemale = sum({{ gender }} == "female", na.rm = TRUE),
+      nMale   = sum({{ gender }} == "male", na.rm = TRUE),
+      nNa     = sum(!({{ gender }} %in% c("male", "female"))),
+      nRight  = sum({{ handedness }} == "right", na.rm = TRUE)
     )
 }
 
 #' @title lazyTime
 #'
-#' @description This is a function that converts a base 10 (minute) time string
-#' to a human-readable base 6 (60) h, m & s string.
+#' @description Converts a time in decimal minutes to a human-readable
+#' "h m s" string (base 60).
 #'
-#' @import stringr
-#'
-#' @param timeVal an unfomarted float
-#' @return character string
+#' @param timeVal numeric vector of durations in minutes
+#' @return character vector
 #' @export
-#' @examples lazyTime(26.70683)
+#' @examples
+#' lazyTime(26.70683)
+#' lazyTime(c(0.5, 26.9999, 135.25, NA))
 lazyTime <- function(timeVal) {
-  hours <- timeVal %/% 60
-  mins <- floor(timeVal) - hours * 60
-  secs <- round((timeVal - floor(timeVal)) * 60)
-  if (hours > 0) {
-    returnString <- str_glue("{hours} h ")
-  } else {
-    returnString <- str_glue("")
-  }
-  return(str_glue("{returnString}{floor(mins)} m {secs} s"))
+  total <- round(timeVal * 60) # round once, in seconds
+  h <- total %/% 3600
+  m <- (total %% 3600) %/% 60
+  s <- total %% 60
+
+  out <- paste0(ifelse(h > 0, paste0(h, " h "), ""), m, " m ", s, " s")
+  ifelse(is.na(timeVal), NA_character_, out)
 }
 
 #' @title lazySave

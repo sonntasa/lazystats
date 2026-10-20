@@ -7,15 +7,16 @@
 lazyTime(timeVal)
 }
 \arguments{
-\item{timeVal}{an unfomarted float}
+\item{timeVal}{numeric vector of durations in minutes}
 }
 \value{
-character string
+character vector
 }
 \description{
-This is a function that converts a base 10 (minute) time string
-to a human-readable base 6 (60) h, m & s string.
+Converts a time in decimal minutes to a human-readable
+"h m s" string (base 60).
 }
 \examples{
 lazyTime(26.70683)
+lazyTime(c(0.5, 26.9999, 135.25, NA))
 }

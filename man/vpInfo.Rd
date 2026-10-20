@@ -4,18 +4,33 @@
 \alias{vpInfo}
 \title{lazydemographics}
 \usage{
-vpInfo(dat)
+vpInfo(
+  dat,
+  participant = id,
+  age = age,
+  gender = gender,
+  handedness = handedness
+)
 }
 \arguments{
 \item{dat}{dataset/tibble}
+
+\item{participant}{unquoted column with the participant identifier}
+
+\item{age}{unquoted column with age (coerced to numeric)}
+
+\item{gender}{unquoted column with gender ("female", "male", other)}
+
+\item{handedness}{unquoted column with handedness ("left", "right")}
 }
 \value{
 tibble
 }
 \description{
-This function takes in one of my vpInfo objects and returns a
-fully formatted participants section---or at least the part where
-demographic information are reported.
-It takes in a dataset, the analyzed variables are id, age (numeric),
-gender (women, men, and non-binary individuals) and handedness (left vs. right).
+Takes a dataset and returns the demographic summary for a
+participants section: N, age (mean, SD, range), gender counts
+(women, men, other) and handedness (right).
+}
+\examples{
+vpInfo(dat, participant = participant, age = age, gender = sex, handedness = hand)
 }
