@@ -483,19 +483,37 @@ vpInfo <- function(dat,
                    age = age,
                    gender = gender,
                    handedness = handedness) {
+  clean <- \(x) tolower(trimws(as.character(x)))
+
   dat |>
-    distinct({{ participant }}, .keep_all = TRUE) |>
-    mutate(.age = as.numeric({{ age }})) |>
-    summarize(
-      N       = n(),
+    dplyr::distinct({{ participant }}, .keep_all = TRUE) |>
+    dplyr::mutate(
+      .age = as.numeric(as.character({{ age }})),
+      .gender = clean({{ gender }}),
+      .gender = dplyr::case_when(
+        .gender %in% c("m", "männlich", "male", "man", "mann") ~ "male",
+        .gender %in% c("f", "weiblich", "female", "woman", "frau") ~ "female",
+        TRUE ~ "other"
+      ),
+      .hand = clean({{ handedness }}),
+      .hand = dplyr::case_when(
+        .hand %in% c("r", "right", "rechts") ~ "right",
+        .hand %in% c("l", "left", "links") ~ "left",
+        TRUE ~ NA_character_
+      )
+    ) |>
+    dplyr::summarise(
+      N = dplyr::n(),
       meanAge = round(mean(.age, na.rm = TRUE), 2),
-      sdAge   = round(sd(.age, na.rm = TRUE), 2),
-      minAge  = min(.age, na.rm = TRUE),
-      maxAge  = max(.age, na.rm = TRUE),
-      nFemale = sum({{ gender }} == "female", na.rm = TRUE),
-      nMale   = sum({{ gender }} == "male", na.rm = TRUE),
-      nNa     = sum(!({{ gender }} %in% c("male", "female"))),
-      nRight  = sum({{ handedness }} == "right", na.rm = TRUE)
+      sdAge = round(sd(.age, na.rm = TRUE), 2),
+      minAge = suppressWarnings(min(.age, na.rm = TRUE)),
+      maxAge = suppressWarnings(max(.age, na.rm = TRUE)),
+      nFemale = sum(.gender == "female", na.rm = TRUE),
+      nMale = sum(.gender == "male", na.rm = TRUE),
+      nOther = sum(.gender == "other", na.rm = TRUE),
+      nRight = sum(.hand == "right", na.rm = TRUE),
+      nLeft = sum(.hand == "left", na.rm = TRUE),
+      nHandNA = sum(is.na(.hand))
     )
 }
 
