@@ -491,8 +491,8 @@ vpInfo <- function(dat,
       .age = as.numeric(as.character({{ age }})),
       .gender = clean({{ gender }}),
       .gender = dplyr::case_when(
-        .gender %in% c("m", "männlich", "male", "man", "mann") ~ "male",
-        .gender %in% c("f", "weiblich", "female", "woman", "frau") ~ "female",
+        .gender %in% c("m", "male", "man", "mann") ~ "male",
+        .gender %in% c("f", "female", "woman", "frau") ~ "female",
         TRUE ~ "other"
       ),
       .hand = clean({{ handedness }}),
